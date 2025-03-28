@@ -28,6 +28,7 @@ func (h Handler) NewRouter() *chi.Mux {
 	})
 
 	r.Route("/devices", func(r chi.Router) {
+		r.Get("/", h.ListDevices)
 		r.Post("/", h.CreateDevice)
 	})
 

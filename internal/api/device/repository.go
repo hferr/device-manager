@@ -4,6 +4,7 @@ import "gorm.io/gorm"
 
 type DeviceRepository interface {
 	InsertDevice(device *Device) error
+	ListDevices() (Devices, error)
 }
 
 type deviceRepository struct {
@@ -22,4 +23,13 @@ func (d *deviceRepository) InsertDevice(device *Device) error {
 	}
 
 	return nil
+}
+
+func (d *deviceRepository) ListDevices() (Devices, error) {
+	ds := make(Devices, 0)
+	if err := d.db.Find(&ds).Error; err != nil {
+		return nil, err
+	}
+
+	return ds, nil
 }

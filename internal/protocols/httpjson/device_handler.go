@@ -7,6 +7,19 @@ import (
 	"net/http"
 )
 
+func (h Handler) ListDevices(w http.ResponseWriter, r *http.Request) {
+	ds, err := h.deviceSvs.ListDevices()
+	if err != nil {
+		http.Error(w, "failed to list devices", http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	input := device.CreateDeviceRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
@@ -32,7 +45,7 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(d.ToDTO()); err != nil {
+	if err := json.NewEncoder(w).Encode(d.ToDto()); err != nil {
 		http.Error(w, "failed to encode response", http.StatusInternalServerError)
 		return
 	}

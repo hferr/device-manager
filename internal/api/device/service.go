@@ -2,6 +2,7 @@ package device
 
 type DeviceService interface {
 	CreateDevice(input CreateDeviceRequest) (*Device, error)
+	ListDevices() (Devices, error)
 }
 
 type deviceService struct {
@@ -22,4 +23,13 @@ func (s *deviceService) CreateDevice(input CreateDeviceRequest) (*Device, error)
 	}
 
 	return d, nil
+}
+
+func (s *deviceService) ListDevices() (Devices, error) {
+	ds, err := s.repo.ListDevices()
+	if err != nil {
+		return nil, err
+	}
+
+	return ds, nil
 }
