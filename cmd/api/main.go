@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github/hferr/device-manager/config"
+	"github/hferr/device-manager/internal/api/device"
 	"github/hferr/device-manager/internal/protocols/httpjson"
 	"github/hferr/device-manager/migrations"
 
@@ -18,13 +19,23 @@ const fmtDBConnString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=d
 func main() {
 	c := config.New()
 
-	if err := setupDB(&c.DB); err != nil {
+	db, err := setupDB(&c.DB)
+	if err != nil {
 		log.Fatalf("failed to setup database: %v", err)
 	}
 
+	// setup repos
+	deviceRepo := device.NewRepository(db)
+
+	// setup services
+	deviceSvs := device.NewService(deviceRepo)
+
+	// setup handlers
+	handler := httpjson.NewHandler(deviceSvs)
+
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),
-		Handler:      httpjson.NewRouter(),
+		Handler:      handler.NewRouter(),
 		ReadTimeout:  c.Server.TimeoutRead,
 		WriteTimeout: c.Server.TimeoutWrite,
 		IdleTimeout:  c.Server.TimeoutIdle,
@@ -35,7 +46,7 @@ func main() {
 	}
 }
 
-func setupDB(cfg *config.ConfDB) error {
+func setupDB(cfg *config.ConfDB) (*gorm.DB, error) {
 	dbConnString := fmt.Sprintf(
 		fmtDBConnString,
 		cfg.Host,
@@ -47,17 +58,17 @@ func setupDB(cfg *config.ConfDB) error {
 
 	db, err := gorm.Open(postgres.Open(dbConnString))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	dbHandle, err := db.DB()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := migrations.MaybeApplyMigrations(dbHandle); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return db, nil
 }
