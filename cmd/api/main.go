@@ -9,6 +9,7 @@ import (
 	"github/hferr/device-manager/internal/api/device"
 	"github/hferr/device-manager/internal/protocols/httpjson"
 	"github/hferr/device-manager/migrations"
+	"github/hferr/device-manager/utils/validator"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -18,6 +19,7 @@ const fmtDBConnString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=d
 
 func main() {
 	c := config.New()
+	v := validator.New()
 
 	db, err := setupDB(&c.DB)
 	if err != nil {
@@ -31,7 +33,7 @@ func main() {
 	deviceSvs := device.NewService(deviceRepo)
 
 	// setup handlers
-	handler := httpjson.NewHandler(deviceSvs)
+	handler := httpjson.NewHandler(deviceSvs, v)
 
 	s := &http.Server{
 		Addr:         fmt.Sprintf(":%d", c.Server.Port),

@@ -5,15 +5,18 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-playground/validator/v10"
 )
 
 type Handler struct {
 	deviceSvs device.DeviceService
+	validator *validator.Validate
 }
 
-func NewHandler(deviceSvs device.DeviceService) *Handler {
+func NewHandler(deviceSvs device.DeviceService, v *validator.Validate) *Handler {
 	return &Handler{
 		deviceSvs: deviceSvs,
+		validator: v,
 	}
 }
 
@@ -22,6 +25,10 @@ func (h Handler) NewRouter() *chi.Mux {
 
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
+	})
+
+	r.Route("/devices", func(r chi.Router) {
+		r.Post("/", h.CreateDevice)
 	})
 
 	return r
