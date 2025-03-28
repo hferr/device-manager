@@ -7,7 +7,6 @@ import (
 
 func TestErrResponse(t *testing.T) {
 	var testCases = map[string]struct {
-		name     string
 		input    any
 		expected string
 	}{
@@ -27,10 +26,10 @@ func TestErrResponse(t *testing.T) {
 
 	v := validator.New()
 
-	for _, tc := range testCases {
+	for name, tc := range testCases {
 		tc := tc
 
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
 			err := v.Struct(tc.input)
