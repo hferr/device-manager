@@ -14,6 +14,8 @@ type Device struct {
 	CreatedAt time.Time
 }
 
+type Devices []*Device
+
 type DTO struct {
 	ID        uuid.UUID `json:"id"`
 	Name      string    `json:"name"`
@@ -38,7 +40,7 @@ func NewDevice(name, brand, state string) *Device {
 	}
 }
 
-func (d *Device) ToDTO() *DTO {
+func (d *Device) ToDto() *DTO {
 	return &DTO{
 		ID:        d.ID,
 		Name:      d.Name,
@@ -46,4 +48,13 @@ func (d *Device) ToDTO() *DTO {
 		State:     d.State,
 		CreatedAt: d.CreatedAt.Format(time.DateTime),
 	}
+}
+
+func (ds Devices) ToDto() []*DTO {
+	dtos := make([]*DTO, len(ds))
+	for i, v := range ds {
+		dtos[i] = v.ToDto()
+	}
+
+	return dtos
 }
