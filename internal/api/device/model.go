@@ -6,18 +6,10 @@ import (
 	"github.com/google/uuid"
 )
 
-type state uint8
-
-const (
-	StateAvailable state = iota
-	StateInUse
-	StateInactive
-)
-
 type Device struct {
 	ID        uuid.UUID `gorm:"primarykey"`
 	Name      string
 	Brand     string
-	State     state
+	State     string
 	CreatedAt time.Time
 }
