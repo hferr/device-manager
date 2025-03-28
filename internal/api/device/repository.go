@@ -9,6 +9,7 @@ type DeviceRepository interface {
 	InsertDevice(device *Device) error
 	ListDevices() (Devices, error)
 	FindByID(ID uuid.UUID) (*Device, error)
+	DeleteDevice(ID uuid.UUID) error
 }
 
 type deviceRepository struct {
@@ -45,4 +46,8 @@ func (r *deviceRepository) FindByID(ID uuid.UUID) (*Device, error) {
 	}
 
 	return d, nil
+}
+
+func (r *deviceRepository) DeleteDevice(ID uuid.UUID) error {
+	return r.db.Where("id = ?", ID).Delete(&Device{}).Error
 }

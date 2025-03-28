@@ -77,3 +77,16 @@ func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
+	ID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.deviceSvs.DeleteDevice(ID); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
