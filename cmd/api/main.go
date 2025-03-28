@@ -7,6 +7,7 @@ import (
 
 	"github/hferr/device-manager/config"
 	"github/hferr/device-manager/internal/protocols/httpjson"
+	"github/hferr/device-manager/migrations"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -44,8 +45,17 @@ func setupDB(cfg *config.ConfDB) error {
 		cfg.Port,
 	)
 
-	_, err := gorm.Open(postgres.Open(dbConnString))
+	db, err := gorm.Open(postgres.Open(dbConnString))
 	if err != nil {
+		return err
+	}
+
+	dbHandle, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	if err := migrations.MaybeApplyMigrations(dbHandle); err != nil {
 		return err
 	}
 
