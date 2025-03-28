@@ -43,3 +43,29 @@ func TestInsertDevice(t *testing.T) {
 		})
 	}
 }
+
+func TestListDevices(t *testing.T) {
+	cleanup, db := test.SetupTestDBContainer(t)
+	defer cleanup()
+
+	repo := device.NewRepository(db)
+
+	wantedDeviceListLen := 4
+	for range wantedDeviceListLen {
+		err := repo.InsertDevice(
+			device.NewDevice("test", "test", "in_use"),
+		)
+		if err != nil {
+			t.Fatalf("expected no error, got: %v", err)
+		}
+	}
+
+	ds, err := repo.ListDevices()
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if wantedDeviceListLen != len(ds) {
+		t.Fatalf("wanted device list len to be %d, got %d", wantedDeviceListLen, len(ds))
+	}
+}
