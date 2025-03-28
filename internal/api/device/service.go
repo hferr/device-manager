@@ -1,8 +1,11 @@
 package device
 
+import "github.com/google/uuid"
+
 type DeviceService interface {
 	CreateDevice(input CreateDeviceRequest) (*Device, error)
 	ListDevices() (Devices, error)
+	FindByID(ID uuid.UUID) (*Device, error)
 }
 
 type deviceService struct {
@@ -32,4 +35,13 @@ func (s *deviceService) ListDevices() (Devices, error) {
 	}
 
 	return ds, nil
+}
+
+func (s *deviceService) FindByID(ID uuid.UUID) (*Device, error) {
+	d, err := s.repo.FindByID(ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }

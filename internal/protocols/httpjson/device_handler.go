@@ -5,6 +5,10 @@ import (
 	"github/hferr/device-manager/internal/api/device"
 	"github/hferr/device-manager/utils/validator"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 func (h Handler) ListDevices(w http.ResponseWriter, r *http.Request) {
@@ -51,4 +55,25 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+}
+
+func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
+	ID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		return
+	}
+
+	d, err := h.deviceSvs.FindByID(ID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(d.ToDto()); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
 }

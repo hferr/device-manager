@@ -1,10 +1,14 @@
 package device
 
-import "gorm.io/gorm"
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
 
 type DeviceRepository interface {
 	InsertDevice(device *Device) error
 	ListDevices() (Devices, error)
+	FindByID(ID uuid.UUID) (*Device, error)
 }
 
 type deviceRepository struct {
@@ -17,19 +21,28 @@ func NewRepository(db *gorm.DB) DeviceRepository {
 	}
 }
 
-func (d *deviceRepository) InsertDevice(device *Device) error {
-	if err := d.db.Create(device).Error; err != nil {
+func (r *deviceRepository) InsertDevice(device *Device) error {
+	if err := r.db.Create(device).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (d *deviceRepository) ListDevices() (Devices, error) {
+func (r *deviceRepository) ListDevices() (Devices, error) {
 	ds := make(Devices, 0)
-	if err := d.db.Find(&ds).Error; err != nil {
+	if err := r.db.Find(&ds).Error; err != nil {
 		return nil, err
 	}
 
 	return ds, nil
+}
+
+func (r *deviceRepository) FindByID(ID uuid.UUID) (*Device, error) {
+	d := &Device{}
+	if err := r.db.Where("id = ?", ID).First(&d).Error; err != nil {
+		return nil, err
+	}
+
+	return d, nil
 }
