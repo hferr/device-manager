@@ -1,16 +1,23 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
+	"github/hferr/device-manager/config"
 	"github/hferr/device-manager/internal/protocols/httpjson"
 )
 
 func main() {
+	c := config.New()
+
 	s := &http.Server{
-		Addr:    ":8080",
-		Handler: httpjson.NewRouter(),
+		Addr:         fmt.Sprintf(":%d", c.Server.Port),
+		Handler:      httpjson.NewRouter(),
+		ReadTimeout:  c.Server.TimeoutRead,
+		WriteTimeout: c.Server.TimeoutWrite,
+		IdleTimeout:  c.Server.TimeoutIdle,
 	}
 
 	if err := s.ListenAndServe(); err != nil {
