@@ -10,40 +10,24 @@ import (
 )
 
 func TestInsertDevice(t *testing.T) {
-	var testCases = map[string]struct {
-		wantErr bool
-		d       *device.Device
-	}{
-		"succesfully insert new device": {
-			wantErr: false,
-			d:       device.NewDevice("test", "test", "available"),
-		},
-		"attempt to insert device with invalid state": {
-			wantErr: true,
-			d:       device.NewDevice("test", "test", "invalid"),
-		},
+	cleanup, db := test.SetupTestDBContainer(t)
+	defer cleanup()
+
+	repo := device.NewRepository(db)
+
+	// assert valid device creation
+
+	d := device.NewDevice("test", "test", "available")
+
+	if err := repo.InsertDevice(d); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
 	}
 
-	for name, tc := range testCases {
-		tc := tc
+	// assert invalid device creation (invalid state)
 
-		t.Run(name, func(t *testing.T) {
-			t.Parallel()
-
-			cleanup, db := test.SetupTestDBContainer(t)
-			defer cleanup()
-
-			repo := device.NewRepository(db)
-
-			err := repo.InsertDevice(tc.d)
-			if err != nil && !tc.wantErr {
-				t.Fatalf("expected no error, got: %v", err)
-			}
-
-			if err == nil && tc.wantErr {
-				t.Fatalf("expected error, got nil")
-			}
-		})
+	invalidDevice := device.NewDevice("test", "test", "invalid")
+	if err := repo.InsertDevice(invalidDevice); err == nil {
+		t.Fatal("expected error, got none")
 	}
 }
 
@@ -80,6 +64,7 @@ func TestFindByID(t *testing.T) {
 	repo := device.NewRepository(db)
 
 	// create and assert device when finding by ID
+
 	device := device.NewDevice("test", "test", "in_use")
 	if err := repo.InsertDevice(device); err != nil {
 		t.Fatalf("expected no error, got: %v", err)
@@ -95,6 +80,7 @@ func TestFindByID(t *testing.T) {
 	}
 
 	// assert device not found case
+
 	_, err = repo.FindByID(uuid.New())
 	if err == nil {
 		t.Fatal("expected error, got none")
