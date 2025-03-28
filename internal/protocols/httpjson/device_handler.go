@@ -78,6 +78,40 @@ func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h Handler) FindByState(w http.ResponseWriter, r *http.Request) {
+	state := chi.URLParam(r, "state")
+
+	ds, err := h.deviceSvs.FindByState(state)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h Handler) FindByBrand(w http.ResponseWriter, r *http.Request) {
+	state := chi.URLParam(r, "brand")
+
+	ds, err := h.deviceSvs.FindByBrand(state)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
+	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
+		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {

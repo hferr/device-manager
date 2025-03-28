@@ -9,6 +9,8 @@ type DeviceRepository interface {
 	InsertDevice(device *Device) error
 	ListDevices() (Devices, error)
 	FindByID(ID uuid.UUID) (*Device, error)
+	FindByState(state string) (Devices, error)
+	FindByBrand(brand string) (Devices, error)
 	DeleteDevice(ID uuid.UUID) error
 }
 
@@ -46,6 +48,24 @@ func (r *deviceRepository) FindByID(ID uuid.UUID) (*Device, error) {
 	}
 
 	return d, nil
+}
+
+func (r *deviceRepository) FindByState(state string) (Devices, error) {
+	ds := make(Devices, 0)
+	if err := r.db.Where("state = ?", state).Find(&ds).Error; err != nil {
+		return nil, err
+	}
+
+	return ds, nil
+}
+
+func (r *deviceRepository) FindByBrand(brand string) (Devices, error) {
+	ds := make(Devices, 0)
+	if err := r.db.Where("brand = ?", brand).Find(&ds).Error; err != nil {
+		return nil, err
+	}
+
+	return ds, nil
 }
 
 func (r *deviceRepository) DeleteDevice(ID uuid.UUID) error {
