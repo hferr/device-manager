@@ -90,3 +90,20 @@ func TestFindByID(t *testing.T) {
 		t.Fatalf("expected error: %v, got: %v", gorm.ErrRecordNotFound, err)
 	}
 }
+
+func TestDeleteDevice(t *testing.T) {
+	cleanup, db := test.SetupTestDBContainer(t)
+	defer cleanup()
+
+	repo := device.NewRepository(db)
+
+	d := device.NewDevice("test", "test", "available")
+	if err := repo.InsertDevice(d); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	err := repo.DeleteDevice(d.ID)
+	if err != nil {
+		t.Fatal("expected error, got none")
+	}
+}
