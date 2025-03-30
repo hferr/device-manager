@@ -5,18 +5,25 @@ import (
 	"log"
 	"net/http"
 
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	"github.com/hferr/device-manager/config"
 	"github.com/hferr/device-manager/internal/api/device"
 	"github.com/hferr/device-manager/internal/protocols/httpjson"
 	"github.com/hferr/device-manager/migrations"
 	"github.com/hferr/device-manager/utils/validator"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	_ "github.com/hferr/device-manager/docs" // generated swagger docs
 )
 
 const fmtDBConnString = "host=%s user=%s password=%s dbname=%s port=%d sslmode=disable"
 
+// @title           Device Manager API
+// @version         1.0
+// @description     API service for managing devices
+
+// @servers.url  localhost:8080
 func main() {
 	c := config.New()
 	v := validator.New()
