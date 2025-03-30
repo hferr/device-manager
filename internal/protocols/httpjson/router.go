@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/hferr/device-manager/internal/api/device"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
@@ -45,6 +46,11 @@ func (h Handler) NewRouter() *chi.Mux {
 		r.Get("/state/{state}", h.FindByState)
 		r.Get("/brand/{brand}", h.FindByBrand)
 	})
+
+	// add Swagger UI endpoint with hardcoded uri for simplicity
+	r.Get("/swagger/*", httpSwagger.Handler(
+		httpSwagger.URL("http://localhost:8080/swagger/doc.json"),
+	))
 
 	return r
 }
