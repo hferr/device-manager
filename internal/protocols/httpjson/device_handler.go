@@ -91,6 +91,8 @@ func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
@@ -173,4 +175,6 @@ func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

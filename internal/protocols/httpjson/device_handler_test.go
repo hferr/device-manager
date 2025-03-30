@@ -176,7 +176,7 @@ func TestHandlerUpdateDevice(t *testing.T) {
 		s        mock.DeviceService
 	}{
 		"successfully updates device": {
-			wantCode: http.StatusOK,
+			wantCode: http.StatusNoContent,
 			input: device.UpdateDeviceRequest{
 				Name:  test.Ptr("updated"),
 				Brand: test.Ptr("updated"),
@@ -447,7 +447,7 @@ func TestHandlerDeleteDevice(t *testing.T) {
 		s        mock.DeviceService
 	}{
 		"successfully deletes device": {
-			wantCode: http.StatusOK,
+			wantCode: http.StatusNoContent,
 			s: mock.DeviceService{
 				DeleteDeviceFunc: func(id uuid.UUID) error {
 					return nil
