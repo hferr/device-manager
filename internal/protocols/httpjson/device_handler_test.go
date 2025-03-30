@@ -36,24 +36,24 @@ func TestHandlerCreateFile(t *testing.T) {
 				},
 			},
 		},
-		"bad request - no device name provided": {
-			wantCode: http.StatusBadRequest,
+		"unprocessable entity - no device name provided": {
+			wantCode: http.StatusUnprocessableEntity,
 			input: device.CreateDeviceRequest{
 				Brand: "test",
 				State: device.StateAvailable,
 			},
 			s: mock.DeviceService{},
 		},
-		"bad request - no device brand name provided": {
-			wantCode: http.StatusBadRequest,
+		"unprocessable entity - no device brand name provided": {
+			wantCode: http.StatusUnprocessableEntity,
 			input: device.CreateDeviceRequest{
 				Name:  "test",
 				State: device.StateAvailable,
 			},
 			s: mock.DeviceService{},
 		},
-		"bad request - invalid device state provided": {
-			wantCode: http.StatusBadRequest,
+		"unprocessable entity - invalid device state provided": {
+			wantCode: http.StatusUnprocessableEntity,
 			input: device.CreateDeviceRequest{
 				Name:  "test",
 				Brand: "test",
@@ -187,8 +187,8 @@ func TestHandlerUpdateDevice(t *testing.T) {
 				},
 			},
 		},
-		"bad request - invalid state": {
-			wantCode: http.StatusBadRequest,
+		"unprocessable entity - invalid state": {
+			wantCode: http.StatusUnprocessableEntity,
 			input: device.UpdateDeviceRequest{
 				Name:  test.Ptr("updated"),
 				Brand: test.Ptr("updated"),
