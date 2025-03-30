@@ -33,7 +33,7 @@ type CreateDeviceRequest struct {
 type UpdateDeviceRequest struct {
 	Name  *string `json:"name"`
 	Brand *string `json:"brand"`
-	State *string `json:"state" validate:"required,oneof=available in_use inactive"`
+	State *string `json:"state" validate:"omitempty,oneof=available in_use inactive"`
 }
 
 func (r *UpdateDeviceRequest) Apply(d *Device) {
