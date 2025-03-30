@@ -14,6 +14,7 @@ const (
 
 type DeviceService interface {
 	CreateDevice(input CreateDeviceRequest) (*Device, error)
+	UpdateDevice(ID uuid.UUID, input UpdateDeviceRequest) error
 	ListDevices() (Devices, error)
 	FindByID(ID uuid.UUID) (*Device, error)
 	FindByState(state string) (Devices, error)
@@ -39,6 +40,25 @@ func (s *deviceService) CreateDevice(input CreateDeviceRequest) (*Device, error)
 	}
 
 	return d, nil
+}
+
+func (s *deviceService) UpdateDevice(ID uuid.UUID, input UpdateDeviceRequest) error {
+	d, err := s.FindByID(ID)
+	if err != nil {
+		return err
+	}
+
+	if !canUpdateDevice(d, input) {
+		return fmt.Errorf("device can not be updated in it's current state")
+	}
+
+	input.Apply(d)
+
+	if err := s.repo.UpdateDevice(d); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *deviceService) ListDevices() (Devices, error) {
@@ -92,4 +112,14 @@ func (s *deviceService) DeleteDevice(ID uuid.UUID) error {
 
 func isDeviceInUse(d *Device) bool {
 	return d.State == StateInUse
+}
+
+func canUpdateDevice(d *Device, input UpdateDeviceRequest) bool {
+	// device name or brand cannot be updated if device state is 'in-use'
+	if (d.State == StateInUse) &&
+		(input.Name != nil || input.Brand != nil) {
+		return false
+	}
+
+	return true
 }

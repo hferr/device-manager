@@ -7,6 +7,7 @@ import (
 
 type DeviceRepository interface {
 	InsertDevice(device *Device) error
+	UpdateDevice(device *Device) error
 	ListDevices() (Devices, error)
 	FindByID(ID uuid.UUID) (*Device, error)
 	FindByState(state string) (Devices, error)
@@ -30,6 +31,15 @@ func (r *deviceRepository) InsertDevice(device *Device) error {
 	}
 
 	return nil
+}
+
+func (r *deviceRepository) UpdateDevice(device *Device) error {
+	res := r.db.Model(&Device{}).
+		Select("name", "brand", "state").
+		Where("id = ?", device.ID).
+		Updates(device)
+
+	return res.Error
 }
 
 func (r *deviceRepository) ListDevices() (Devices, error) {

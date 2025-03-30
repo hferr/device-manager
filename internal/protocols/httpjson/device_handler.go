@@ -56,6 +56,37 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
+	ID, err := uuid.Parse(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		return
+	}
+
+	input := device.UpdateDeviceRequest{}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		http.Error(w, "failed to decode request body", http.StatusBadRequest)
+		return
+	}
+
+	if err := h.validator.Struct(input); err != nil {
+		res, err := json.Marshal(validator.ErrResponse(err))
+		if err != nil {
+			http.Error(w, "failed to marshal error response", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write(res)
+		return
+	}
+
+	if err := h.deviceSvs.UpdateDevice(ID, input); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {

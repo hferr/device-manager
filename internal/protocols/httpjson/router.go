@@ -31,6 +31,7 @@ func (h Handler) NewRouter() *chi.Mux {
 		r.Get("/", h.ListDevices)
 		r.Get("/{id}", h.FindByID)
 		r.Post("/", h.CreateDevice)
+		r.Patch("/{id}", h.UpdateDevice)
 		r.Delete("/{id}", h.DeleteDevice)
 
 		r.Get("/state/{state}", h.FindByState)
