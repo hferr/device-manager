@@ -3,8 +3,12 @@ package test
 import (
 	"context"
 	"fmt"
+	"github/hferr/device-manager/internal/protocols/httpjson"
 	"github/hferr/device-manager/migrations"
+	"io"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
 
@@ -69,4 +73,15 @@ func SetupTestDBContainer(t *testing.T) (func(), *gorm.DB) {
 	}
 
 	return cleanup, db
+}
+
+func Ptr[T any](v T) *T { return &v }
+
+func DoHttpRequest(handler *httpjson.Handler, method, target string, body io.Reader) *http.Response {
+	req := httptest.NewRequest(method, target, body)
+	w := httptest.NewRecorder()
+
+	handler.NewRouter().ServeHTTP(w, req)
+
+	return w.Result()
 }
