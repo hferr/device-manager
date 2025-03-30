@@ -9,6 +9,11 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
+const (
+	HeaderKeyContentType       = "Content-Type"
+	HeaderValueContentTypeJSON = "application/json;charset=utf8"
+)
+
 type Handler struct {
 	deviceSvs device.DeviceService
 	validator *validator.Validate
@@ -29,6 +34,8 @@ func (h Handler) NewRouter() *chi.Mux {
 	})
 
 	r.Route("/devices", func(r chi.Router) {
+		r.Use(middlewareContentTypeJSON)
+
 		r.Get("/", h.ListDevices)
 		r.Get("/{id}", h.FindByID)
 		r.Post("/", h.CreateDevice)
@@ -40,4 +47,11 @@ func (h Handler) NewRouter() *chi.Mux {
 	})
 
 	return r
+}
+
+func middlewareContentTypeJSON(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set(HeaderKeyContentType, HeaderValueContentTypeJSON)
+		next.ServeHTTP(w, r)
+	})
 }
