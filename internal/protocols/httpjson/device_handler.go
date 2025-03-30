@@ -49,12 +49,11 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(d.ToDto()); err != nil {
 		http.Error(w, "failed to encode response", http.StatusInternalServerError)
 		return
 	}
-
-	w.WriteHeader(http.StatusCreated)
 }
 
 func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
