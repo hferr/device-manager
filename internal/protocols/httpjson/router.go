@@ -1,8 +1,9 @@
 package httpjson
 
 import (
-	"github/hferr/device-manager/internal/api/device"
 	"net/http"
+
+	"github.com/hferr/device-manager/internal/api/device"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"

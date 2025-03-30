@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github/hferr/device-manager/internal/api/device"
+	"github.com/hferr/device-manager/internal/api/device"
 
 	"github.com/google/uuid"
 )

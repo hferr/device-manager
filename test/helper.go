@@ -3,14 +3,15 @@ package test
 import (
 	"context"
 	"fmt"
-	"github/hferr/device-manager/internal/protocols/httpjson"
-	"github/hferr/device-manager/migrations"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/hferr/device-manager/internal/protocols/httpjson"
+	"github.com/hferr/device-manager/migrations"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"

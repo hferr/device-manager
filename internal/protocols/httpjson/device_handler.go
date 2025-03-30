@@ -3,9 +3,10 @@ package httpjson
 import (
 	"encoding/json"
 	"errors"
-	"github/hferr/device-manager/internal/api/device"
-	"github/hferr/device-manager/utils/validator"
 	"net/http"
+
+	"github.com/hferr/device-manager/internal/api/device"
+	"github.com/hferr/device-manager/utils/validator"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"

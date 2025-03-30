@@ -1,4 +1,4 @@
-module github/hferr/device-manager
+module github.com/hferr/device-manager
 
 go 1.24.1
 

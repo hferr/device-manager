@@ -1,8 +1,9 @@
 package validator_test
 
 import (
-	"github/hferr/device-manager/utils/validator"
 	"testing"
+
+	"github.com/hferr/device-manager/utils/validator"
 )
 
 func TestErrResponse(t *testing.T) {

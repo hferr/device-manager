@@ -5,11 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github/hferr/device-manager/config"
-	"github/hferr/device-manager/internal/api/device"
-	"github/hferr/device-manager/internal/protocols/httpjson"
-	"github/hferr/device-manager/migrations"
-	"github/hferr/device-manager/utils/validator"
+	"github.com/hferr/device-manager/config"
+	"github.com/hferr/device-manager/internal/api/device"
+	"github.com/hferr/device-manager/internal/protocols/httpjson"
+	"github.com/hferr/device-manager/migrations"
+	"github.com/hferr/device-manager/utils/validator"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

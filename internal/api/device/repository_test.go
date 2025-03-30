@@ -1,9 +1,10 @@
 package device_test
 
 import (
-	"github/hferr/device-manager/internal/api/device"
-	"github/hferr/device-manager/test"
 	"testing"
+
+	"github.com/hferr/device-manager/internal/api/device"
+	"github.com/hferr/device-manager/test"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"

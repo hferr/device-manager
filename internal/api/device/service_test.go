@@ -2,10 +2,11 @@ package device_test
 
 import (
 	"fmt"
-	"github/hferr/device-manager/internal/api/device"
-	"github/hferr/device-manager/test"
-	"github/hferr/device-manager/test/mock"
 	"testing"
+
+	"github.com/hferr/device-manager/internal/api/device"
+	"github.com/hferr/device-manager/test"
+	"github.com/hferr/device-manager/test/mock"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
