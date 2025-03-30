@@ -203,3 +203,45 @@ func TestFindByBrand(t *testing.T) {
 		t.Fatalf("expected %d devices, got: %d", len(devicesWithBrand2), len(devicesWithBrand2FromDB))
 	}
 }
+
+func TestUpdateDevice(t *testing.T) {
+	cleanup, db := test.SetupTestDBContainer(t)
+	defer cleanup()
+
+	repo := device.NewRepository(db)
+
+	// create a device to update
+
+	d := device.NewDevice("test", "test", "available")
+	if err := repo.InsertDevice(d); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	// update the device
+
+	wantName, wantBrand, wantState := "updated_test", "updated_test", "in_use"
+	d.Name, d.Brand, d.State = wantName, wantBrand, wantState
+
+	if err := repo.UpdateDevice(d); err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	// fetch the updated device and assert changes
+
+	updatedDevice, err := repo.FindByID(d.ID)
+	if err != nil {
+		t.Fatalf("expected no error, got: %v", err)
+	}
+
+	if wantName != updatedDevice.Name {
+		t.Fatalf("expected name to be %s, got: %s", wantName, updatedDevice.Name)
+	}
+
+	if wantBrand != updatedDevice.Brand {
+		t.Fatalf("expected brand to be %s, got: %s", wantBrand, updatedDevice.Brand)
+	}
+
+	if wantState != updatedDevice.State {
+		t.Fatalf("expected state to be %s, got: %s", wantState, updatedDevice.State)
+	}
+}
