@@ -1,7 +1,7 @@
 package device
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/google/uuid"
 )
@@ -10,6 +10,10 @@ const (
 	StateAvailable string = "available"
 	StateInUse     string = "in_use"
 	StateInactive  string = "inactive"
+)
+
+var (
+	ErrDeviceInUse = errors.New("operation cannot be completed because the device is in use")
 )
 
 type DeviceService interface {
@@ -49,7 +53,7 @@ func (s *deviceService) UpdateDevice(ID uuid.UUID, input UpdateDeviceRequest) er
 	}
 
 	if !canUpdateDevice(d, input) {
-		return fmt.Errorf("device can not be updated in it's current state")
+		return ErrDeviceInUse
 	}
 
 	input.Apply(d)
@@ -104,7 +108,7 @@ func (s *deviceService) DeleteDevice(ID uuid.UUID) error {
 	}
 
 	if isDeviceInUse(d) {
-		return fmt.Errorf("device is in-use and cannot be deleted")
+		return ErrDeviceInUse
 	}
 
 	return s.repo.DeleteDevice(ID)

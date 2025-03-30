@@ -199,6 +199,18 @@ func TestHandlerUpdateDevice(t *testing.T) {
 				},
 			},
 		},
+		"device is in use error": {
+			wantCode: http.StatusUnprocessableEntity,
+			input: device.UpdateDeviceRequest{
+				Name:  test.Ptr("updated"),
+				Brand: test.Ptr("updated"),
+			},
+			s: mock.DeviceService{
+				UpdateDeviceFunc: func(id uuid.UUID, input device.UpdateDeviceRequest) error {
+					return device.ErrDeviceInUse
+				},
+			},
+		},
 		"service returns error": {
 			wantCode: http.StatusInternalServerError,
 			input: device.UpdateDeviceRequest{
@@ -438,6 +450,14 @@ func TestHandlerDeleteDevice(t *testing.T) {
 			s: mock.DeviceService{
 				DeleteDeviceFunc: func(id uuid.UUID) error {
 					return nil
+				},
+			},
+		},
+		"device is in use error": {
+			wantCode: http.StatusUnprocessableEntity,
+			s: mock.DeviceService{
+				DeleteDeviceFunc: func(id uuid.UUID) error {
+					return device.ErrDeviceInUse
 				},
 			},
 		},

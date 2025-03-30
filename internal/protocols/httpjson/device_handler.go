@@ -2,6 +2,7 @@ package httpjson
 
 import (
 	"encoding/json"
+	"errors"
 	"github/hferr/device-manager/internal/api/device"
 	"github/hferr/device-manager/utils/validator"
 	"net/http"
@@ -82,6 +83,11 @@ func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.deviceSvs.UpdateDevice(ID, input); err != nil {
+		if errors.Is(err, device.ErrDeviceInUse) {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -159,6 +165,11 @@ func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.deviceSvs.DeleteDevice(ID); err != nil {
+		if errors.Is(err, device.ErrDeviceInUse) {
+			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			return
+		}
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
