@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/hferr/device-manager/internal/api/device"
+	e "github.com/hferr/device-manager/internal/api/err"
 	"github.com/hferr/device-manager/utils/validator"
 
 	"github.com/go-chi/chi/v5"
@@ -16,12 +17,12 @@ import (
 func (h Handler) ListDevices(w http.ResponseWriter, r *http.Request) {
 	ds, err := h.deviceSvs.ListDevices()
 	if err != nil {
-		http.Error(w, "failed to list devices", http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		e.ServerError(w, e.JSONEncodeErrResp)
 		return
 	}
 }
@@ -29,31 +30,30 @@ func (h Handler) ListDevices(w http.ResponseWriter, r *http.Request) {
 func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 	input := device.CreateDeviceRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "failed to decode request body", http.StatusBadRequest)
+		e.BadRequest(w, e.JSONDecodeErrResp)
 		return
 	}
 
 	if err := h.validator.Struct(input); err != nil {
 		res, err := json.Marshal(validator.ErrResponse(err))
 		if err != nil {
-			http.Error(w, "failed to marshal error response", http.StatusInternalServerError)
+			e.BadRequest(w, e.JSONDecodeErrResp)
 			return
 		}
 
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(res)
+		e.UnprocessableEntity(w, res)
 		return
 	}
 
 	d, err := h.deviceSvs.CreateDevice(input)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
 	if err := json.NewEncoder(w).Encode(d.ToDto()); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		e.ServerError(w, e.JSONEncodeErrResp)
 		return
 	}
 }
@@ -61,35 +61,34 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		e.BadRequest(w, e.InvalidIDErrResp)
 		return
 	}
 
 	input := device.UpdateDeviceRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "failed to decode request body", http.StatusBadRequest)
+		e.BadRequest(w, e.JSONDecodeErrResp)
 		return
 	}
 
 	if err := h.validator.Struct(input); err != nil {
 		res, err := json.Marshal(validator.ErrResponse(err))
 		if err != nil {
-			http.Error(w, "failed to marshal error response", http.StatusInternalServerError)
+			e.BadRequest(w, e.JSONDecodeErrResp)
 			return
 		}
 
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(res)
+		e.UnprocessableEntity(w, res)
 		return
 	}
 
 	if err := h.deviceSvs.UpdateDevice(ID, input); err != nil {
 		if errors.Is(err, device.ErrDeviceInUse) {
-			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			e.UnprocessableEntity(w, e.DeviceInUseErrResp)
 			return
 		}
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 }
@@ -97,23 +96,23 @@ func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 func (h Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		e.BadRequest(w, e.InvalidIDErrResp)
 		return
 	}
 
 	d, err := h.deviceSvs.FindByID(ID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			w.WriteHeader(http.StatusNotFound)
+			e.NotFound(w, e.DeviceNotFoundErrResp)
 			return
 		}
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(d.ToDto()); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		e.ServerError(w, e.JSONEncodeErrResp)
 		return
 	}
 }
@@ -124,16 +123,16 @@ func (h Handler) FindByState(w http.ResponseWriter, r *http.Request) {
 	ds, err := h.deviceSvs.FindByState(state)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			w.WriteHeader(http.StatusNotFound)
+			e.NotFound(w, e.DeviceNotFoundErrResp)
 			return
 		}
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		e.ServerError(w, e.JSONEncodeErrResp)
 		return
 	}
 }
@@ -144,16 +143,16 @@ func (h Handler) FindByBrand(w http.ResponseWriter, r *http.Request) {
 	ds, err := h.deviceSvs.FindByBrand(state)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			w.WriteHeader(http.StatusNotFound)
+			e.NotFound(w, e.DeviceNotFoundErrResp)
 			return
 		}
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 
 	if err := json.NewEncoder(w).Encode(ds.ToDto()); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
+		e.ServerError(w, e.JSONEncodeErrResp)
 		return
 	}
 }
@@ -161,17 +160,17 @@ func (h Handler) FindByBrand(w http.ResponseWriter, r *http.Request) {
 func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 	ID, err := uuid.Parse(chi.URLParam(r, "id"))
 	if err != nil {
-		http.Error(w, "invalid ID param", http.StatusBadRequest)
+		e.BadRequest(w, e.InvalidIDErrResp)
 		return
 	}
 
 	if err := h.deviceSvs.DeleteDevice(ID); err != nil {
 		if errors.Is(err, device.ErrDeviceInUse) {
-			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+			e.UnprocessableEntity(w, e.DeviceInUseErrResp)
 			return
 		}
 
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		e.ServerError(w, e.DeviceServiceFailedErrResp)
 		return
 	}
 }
