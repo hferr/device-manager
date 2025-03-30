@@ -30,9 +30,7 @@ func NewHandler(deviceSvs device.DeviceService, v *validator.Validate) *Handler 
 func (h Handler) NewRouter() *chi.Mux {
 	r := chi.NewRouter()
 
-	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
+	r.Get("/health", h.HealthCheck)
 
 	r.Route("/devices", func(r chi.Router) {
 		r.Use(middlewareContentTypeJSON)
