@@ -200,6 +200,18 @@ func TestHandlerUpdateDevice(t *testing.T) {
 				},
 			},
 		},
+		"device not found error": {
+			wantCode: http.StatusNotFound,
+			input: device.UpdateDeviceRequest{
+				Name:  test.Ptr("updated"),
+				Brand: test.Ptr("updated"),
+			},
+			s: mock.DeviceService{
+				UpdateDeviceFunc: func(id uuid.UUID, input device.UpdateDeviceRequest) error {
+					return gorm.ErrRecordNotFound
+				},
+			},
+		},
 		"device is in use error": {
 			wantCode: http.StatusUnprocessableEntity,
 			input: device.UpdateDeviceRequest{
@@ -451,6 +463,14 @@ func TestHandlerDeleteDevice(t *testing.T) {
 			s: mock.DeviceService{
 				DeleteDeviceFunc: func(id uuid.UUID) error {
 					return nil
+				},
+			},
+		},
+		"device not found error": {
+			wantCode: http.StatusNotFound,
+			s: mock.DeviceService{
+				DeleteDeviceFunc: func(id uuid.UUID) error {
+					return gorm.ErrRecordNotFound
 				},
 			},
 		},

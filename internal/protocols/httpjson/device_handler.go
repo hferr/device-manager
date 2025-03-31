@@ -86,6 +86,7 @@ func (h Handler) CreateDevice(w http.ResponseWriter, r *http.Request) {
 // @Param        device  body      device.UpdateDeviceRequest  true  "Updated device request object"
 // @Success      204
 // @Failure      400     {object}  err.Error
+// @Failure		 404     {object}  err.Error
 // @Failure      422     {object}  err.Errors
 // @Failure      500     {object}  err.Error
 // @Router       /devices/{id} [patch]
@@ -114,6 +115,10 @@ func (h Handler) UpdateDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.deviceSvs.UpdateDevice(ID, input); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			e.NotFound(w, e.DeviceNotFoundErrResp)
+			return
+		}
 		if errors.Is(err, device.ErrDeviceInUse) {
 			e.UnprocessableEntity(w, e.DeviceInUseErrResp)
 			return
@@ -227,6 +232,7 @@ func (h Handler) FindByBrand(w http.ResponseWriter, r *http.Request) {
 // @Param        id   path      string  true  "Device ID"
 // @Success      204
 // @Failure      400  {object}  err.Error
+// @Failure		 404  {object}  err.Error
 // @Failure      422  {object}  err.Error
 // @Failure      500  {object}  err.Error
 // @Router       /devices/{id} [delete]
@@ -238,6 +244,10 @@ func (h Handler) DeleteDevice(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.deviceSvs.DeleteDevice(ID); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			e.NotFound(w, e.DeviceNotFoundErrResp)
+			return
+		}
 		if errors.Is(err, device.ErrDeviceInUse) {
 			e.UnprocessableEntity(w, e.DeviceInUseErrResp)
 			return
