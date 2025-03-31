@@ -105,6 +105,7 @@ commands.
 
 ## Notes
 
+- A device cannot be updated if its state's `in_use`. The state has to be updated alone before attempting to update `name` and `brand`.
 - I've decided to use the `testcontainers-go` package for the repository implementation tests so that I could test the behavior against a real database at the cost of the tests taking a little longer to run.
 - Tests for the `handler` and `service` package dependencies were done by mock implementing the interfaces in the `mock` package.
 - Both the `.env` file and the swagger generated files were checked into git for simplicity.
